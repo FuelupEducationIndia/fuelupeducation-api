@@ -1,13 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/userControllers");
+const userControllers = require("../controllers/userControllers");
 
 // api for singup
-router.post("/signup", controller.signup);
+router.post("/signup", userControllers.signup);
 
 // api for loggin 
-router.post("/login", controller.login);
+router.post("/login", userControllers.login);
 
-router.get('/getUser/:userId', controller.allowIfLoggedin, controller.getUser);
+// api to check page permission for diffrent roles
+router.get('/getAllUsers',
+    userControllers.allowIfLoggedin,
+    userControllers.grantAccess('readAny', 'profile'),
+    userControllers.getAllUsers
+);
 
 module.exports = router;

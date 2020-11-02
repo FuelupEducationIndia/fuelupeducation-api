@@ -4,9 +4,7 @@ const {
     validate
 } = require("../models/user.model");
 
-const {
-    roles
-} = require("../middleware/roles");
+const roles = require("../middleware/roles");
 
 // function to hash password
 async function hashPassword(password) {
@@ -106,48 +104,48 @@ exports.login = async(req, res, next) => {
     }
 };
 
-exports.getUsers = async(req, res, next) => {
+exports.getAllUsers = async(req, res, next) => {
     const users = await User.find({});
     res.status(200).json({
         data: users
     });
 }
 
+// function to get user by ID
 exports.getUser = async(req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+        if (!user) return next(new Error('User does not exist'));
+        res.status(200).json({
+            data: user
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+
+// function to check user request for action have permission or not
+exports.grantAccess = function(action, resource) {
+    return async(req, res, next) => {
         try {
-            const userId = req.params.userId;
-            const user = await User.findById(userId);
-            if (!user) return next(new Error('User does not exist'));
-            res.status(200).json({
-                data: user
-            });
+            const permission = roles.role.can(req.user.role)[action](resource);
+            if (!permission.granted) {
+                return res.status(401).json({
+                    error: "You don't have enough permission to perform this action"
+                });
+            }
+            next()
         } catch (error) {
             next(error)
         }
     }
-    // function to check user request for action have permission or not
-exports.grantAccess = function(action, resource) {
-    async(req, res, next) => {
-        try {
-            const permission = roles.can(req.user.role)[action](resource);
-
-            if (!permission.granted) {
-                return res.status(401).json({
-                    error: "You don't have enough permission to perform this action",
-                });
-            }
-
-            next();
-        } catch (error) {
-            next(error);
-        }
-    };
-};
+}
 
 // function to check whether user is logged in or not
 exports.allowIfLoggedin = async(req, res, next) => {
     try {
-        const user = req.locals.loggedInUser;
+        const user = res.locals.loggedInUser;
         if (!user) {
             res.status(401).json({
                 error: "You need to be logged in to access this route",
