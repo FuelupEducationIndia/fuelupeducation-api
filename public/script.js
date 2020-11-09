@@ -1,4 +1,4 @@
-const socket = io(server);
+const socket = io('/');
 const mypeer = new Peer(undefined, {
     host: '/',
     port: '3030'

@@ -1,7 +1,7 @@
 const {
-    v4: uuidV4
+    v4: uuidv4
 } = require("uuid");
 
 exports.createRoomId = function(req, res) {
-    res.redirect(`/users/room/${uuidV4()}`);
+    res.redirect(`/users/room/${uuidv4()}`);
 };
