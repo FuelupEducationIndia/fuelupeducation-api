@@ -73,18 +73,15 @@ app.get('/users/room/:room', (req, res) => {
 
 // socket connecntion 
 io.on('connection', socket => {
-    console.log('ssssssssssss')
     socket.on('join-room', (roomId, userId) => {
-        socket.join(roomId);
-        socket.to(roomId).broadcast.emit('user-connected', userId);
+        socket.join(roomId)
+        socket.to(roomId).broadcast.emit('user-connected', userId)
 
-    });
-
-    socket.on('disconnect', () => {
-        socket.to(roomId).broadcast.emit('user-disconnected', userId);
-    });
-
-});
-app.listen(port, () => {
+        socket.on('disconnect', () => {
+            socket.to(roomId).broadcast.emit('user-disconnected', userId)
+        })
+    })
+})
+server.listen(port, () => {
     console.log(`This server run at  ${port}...`);
 });
