@@ -1,28 +1,29 @@
-const config = require("config");
-const express = require("express");
+const express = require('express');
 const jwt = require("jsonwebtoken");
-const path = require("path");
+const app = express();
 const {
     User
 } = require("./models/user.model");
 const port = process.env.PORT || 5000;
 const mongoose = require("mongoose");
 const route = require("./routes/users.route");
-
-const app = express();
-// live video chat
-const server = require("http").Server(app);
+const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const {
     ExpressPeerServer
 } = require('peer');
 const peerServer = ExpressPeerServer(server, {
-    debug: true
+    debug: true,
+    port: 3030,
 });
+const {
+    v4: uuidV4
+} = require('uuid');
+
+app.use('/peerjs', peerServer);
 
 app.set('view engine', 'ejs');
-app.use(express.static(__dirname + "/public"))
-app.use('/peerjs', peerServer);
+app.use(express.static('public'));
 
 require("dotenv").config();
 // connect to mongo DB
@@ -64,24 +65,34 @@ app.use(async(req, res, next) => {
 //use users route for api/users
 app.use("/api/users", route);
 
-app.get('/users/room/:room', (req, res) => {
+app.get('/', (req, res) => {
+    res.redirect(`/${uuidV4()}`);
+});
+
+app.get('/leave', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/:room', (req, res) => {
     res.render('room', {
         roomId: req.params.room
-    })
-})
+    });
+});
 
-
-// socket connecntion 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
     socket.on('join-room', (roomId, userId) => {
-        socket.join(roomId)
-        socket.to(roomId).broadcast.emit('user-connected', userId)
+        socket.join(roomId);
+        socket.to(roomId).broadcast.emit('user-connected', userId);
+        // messages
+        socket.on('message', (message) => {
+            //send message to the same room
+            io.to(roomId).emit('createMessage', message);
+        });
 
         socket.on('disconnect', () => {
-            socket.to(roomId).broadcast.emit('user-disconnected', userId)
-        })
-    })
-})
-server.listen(port, () => {
-    console.log(`This server run at  ${port}...`);
+            socket.to(roomId).broadcast.emit('user-disconnected', userId);
+        });
+    });
 });
+
+server.listen(process.env.PORT || port);
