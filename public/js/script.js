@@ -17,19 +17,19 @@ var recordedStream = [];
 myVideo.muted = true;
 
 if (!navigator.mediaDevices) {
-    alert('getUserMedia support required to use this page')
+    alert("getUserMedia support required to use this page");
 }
 navigator.mediaDevices
     .getUserMedia({
         audio: true,
         video: {
             width: {
-                ideal: 1280
+                ideal: 1280,
             },
             height: {
-                ideal: 720
-            }
-        }
+                ideal: 720,
+            },
+        },
     })
     .then((stream) => {
         myVideoStream = stream;
@@ -49,6 +49,22 @@ navigator.mediaDevices
     })
     .catch((err) => {});
 
+// input value
+let text = $("input");
+
+// get input value when user type...
+$("html").keydown(function(e) {
+    if (e.which == 13 && text.val().length !== 0) {
+        socket.emit("message", text.val());
+        text.val("");
+    }
+});
+
+socket.on("createMessage", (message, userId) => {
+    $("ul").append(`<li class="message"><b>${userId}</b><br/>${message}</li>`);
+    scrollToBottom();
+});
+
 socket.on("user-disconnected", (userId) => {
     if (peers[userId]) peers[userId].close();
 });
@@ -56,6 +72,11 @@ socket.on("user-disconnected", (userId) => {
 mypeer.on("open", (id) => {
     socket.emit("join-room", ROOM_ID, id);
 });
+
+function scrollToBottom() {
+    var d = $(".main__chat_window");
+    d.scrollTop(d.prop("scrollHeight"));
+}
 
 function connectToNewUser(userId, stream) {
     const call = mypeer.call(userId, stream);
@@ -155,10 +176,7 @@ function toggleModal(id, show) {
     }
 }
 
-function recordScreen() {}
-
 function startRecording(stream) {
-
     mediaRecorder = new MediaRecorder(stream, {
         mimeType: "video/webm;codecs=vp9",
     });
@@ -189,22 +207,32 @@ function saveRecordedStream(stream, user) {
 
     let file = new File([blob], `${user}-${moment().unix()}-record.webm`);
 
-    // let fd = new FormData();
-    // fd.append("fileName", file);
-    // fd.append("data", blob);
-    // console.log(fd)
-    // $.ajax({
-    //         type: 'POST',
-    //         url: '/',
-    //         data: fd,
-    //         processData: false,
-    //         contentType: false
-    //     }).done(function(data) {
-    //         console.log(data)
-    //     })
-    saveAs(file);
-}
+    // create FormData
+    var formData = new FormData();
+    formData.append('videoFilename', file.name);
+    formData.append('videoData', file);
 
+    for (var key of formData.entries()) {
+        console.log(key[0] + ', ' + key[1]);
+    }
+
+    // create FormData
+    // var formData = new FormData();
+    // formData.append("video-filename", file);
+    // formData.append("video-blob", stream);
+    // console.log(formData);
+    // console.log(stream);
+    $.ajax({
+        type: "POST",
+        url: "/uploadRecording",
+        data: formData,
+        processData: false,
+        contentType: false,
+    }).done(function(data) {
+        console.log(data);
+    });
+    //saveAs(file);
+}
 
 function toggleRecordingIcons(isRecording) {
     let e = document.getElementById("record");
@@ -221,49 +249,48 @@ function toggleRecordingIcons(isRecording) {
 }
 
 //When record button is clicked
-document.getElementById('record').addEventListener('click', (e) => {
+document.getElementById("record").addEventListener("click", (e) => {
     /**
      * Ask user what they want to record.
      * Get the stream based on selection and start recording
      */
-    if (!mediaRecorder || mediaRecorder.state == 'inactive') {
-        toggleModal('recording-options-modal', true);
-    } else if (mediaRecorder.state == 'paused') {
+    if (!mediaRecorder || mediaRecorder.state == "inactive") {
+        toggleModal("recording-options-modal", true);
+    } else if (mediaRecorder.state == "paused") {
         mediaRecorder.resume();
-    } else if (mediaRecorder.state == 'recording') {
+    } else if (mediaRecorder.state == "recording") {
         mediaRecorder.stop();
     }
 });
 
 //When user choose to record own video
-document.getElementById('record-video').addEventListener('click', () => {
-    toggleModal('recording-options-modal', false);
+document.getElementById("record-video").addEventListener("click", () => {
+    toggleModal("recording-options-modal", false);
 
     if (myVideoStream && myVideoStream.getTracks().length) {
         startRecording(myVideoStream);
-    } else {
-
-    }
+    } else {}
 });
 
 //When user choose to record sreen
-document.getElementById("record-screen").addEventListener('click', () => {
-    toggleModal('recording-options-modal', false);
-    shareScreen().then((screenStream) => {
-        startRecording(screenStream);
-    }).catch(() => {});
+document.getElementById("record-screen").addEventListener("click", () => {
+    toggleModal("recording-options-modal", false);
+    shareScreen()
+        .then((screenStream) => {
+            startRecording(screenStream);
+        })
+        .catch(() => {});
 });
-
 
 function shareScreen() {
     return navigator.mediaDevices.getDisplayMedia({
         video: {
-            cursor: "always"
+            cursor: "always",
         },
         audio: {
             echoCancellation: true,
             noiseSuppression: true,
-            sampleRate: 44100
-        }
+            sampleRate: 44100,
+        },
     });
 }

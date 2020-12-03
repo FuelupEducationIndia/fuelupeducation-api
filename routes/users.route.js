@@ -20,4 +20,7 @@ router.get(
 //api to create room id
 router.get("/createRoom", roomController.createRoomId);
 
+//api to upload call recording
+router.post('/uploadRecording', roomController.uploadCallRecording);
+
 module.exports = router;
