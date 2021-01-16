@@ -2,6 +2,7 @@ var formidable = require("formidable");
 util = require("util");
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const bodyParse = require('body-parser');
 const app = express();
 const {
     User
@@ -47,6 +48,14 @@ app.use("/peerjs", peerServer);
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
+
+app.use(bodyParse.json({
+    extended: true
+}));
+app.use(bodyParse.urlencoded({
+    extended: true
+}));
+
 
 require("dotenv").config();
 // connect to mongo DB
