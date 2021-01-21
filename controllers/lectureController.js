@@ -4,6 +4,9 @@ var dir = __dirname + '/../uploads/lectures/';
 const {
     Lecture
 } = require("../models/lecture.model");
+const {
+    mongo
+} = require("mongoose");
 
 // write code for lecture uploadto folder and save in database.
 
@@ -86,4 +89,28 @@ exports.getLecturesById = async(req, res, next) => {
 
     })
 
+}
+
+// Api to delete lecture using lecture id
+exports.deleteLectureById = async(req, res, next) => {
+    var getLetcureById = await Lecture.findById(req.param('id'), (err, result) => {
+        if (err) {
+            res.send(err);
+        }
+        if (result) {
+            try {
+                Lecture.deleteOne({
+                    _id: new mongo.ObjectID(req.param('id'))
+                }, (error) => {
+                    if (error) throw error;
+                });
+                res.send(JSON.stringify("Record deleted successfully!"));
+            } catch (e) {
+                res.send(e);
+            }
+
+        } else {
+            res.send(JSON.stringify("Data not found!"));
+        }
+    })
 }
