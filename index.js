@@ -22,11 +22,12 @@ const peerServer = ExpressPeerServer(server, {
 const {
     v4: uuidV4
 } = require("uuid");
-
+// Call response mondule
+const responseHelpers = require('../helpers/response.helpers');
 // s3 call
 const AWS = require("aws-sdk");
-const ID = "AKIAIEZ6T76AJ5VM2T6Q";
-const SECRET = "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";
+const ID = process.env.AWS_KEY;
+const SECRET = process.env.AWS_SECRET;
 // The name of the bucket that you have created
 const BUCKET_NAME = "videocall-record";
 const s3 = new AWS.S3({
@@ -96,9 +97,7 @@ app.use(async(req, res, next) => {
 app.post("/uploadRecording", function(req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-        if (err) {
-            res.send(err.message);
-        }
+        if (err) responseHelpers.errorMessage(err, res, 400);
         const params = {
             Bucket: BUCKET_NAME,
             Key: fields.videoFilename, // File name you want to save as in S3
@@ -106,10 +105,8 @@ app.post("/uploadRecording", function(req, res) {
         };
         // Uploading files to the bucket
         s3.upload(params, function(err, data) {
-            if (err) {
-                throw err;
-            }
-            res.send(`Call record uploaded successfully.Url: ${data.Location}`);
+            if (err) responseHelpers.errorMessage(err, res, 400);
+            responseHelpers.successMessage(data, res, 200, `Call record uploaded successfully.Url: ${data.Location}`);
         });
     });
 });

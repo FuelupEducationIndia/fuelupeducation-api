@@ -212,16 +212,6 @@ function saveRecordedStream(stream, user) {
     formData.append('videoFilename', file.name);
     formData.append('videoData', file);
 
-    for (var key of formData.entries()) {
-        console.log(key[0] + ', ' + key[1]);
-    }
-
-    // create FormData
-    // var formData = new FormData();
-    // formData.append("video-filename", file);
-    // formData.append("video-blob", stream);
-    // console.log(formData);
-    // console.log(stream);
     $.ajax({
         type: "POST",
         url: "/uploadRecording",
