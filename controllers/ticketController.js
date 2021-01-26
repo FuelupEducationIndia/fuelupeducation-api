@@ -30,7 +30,7 @@ exports.createTicket = async(req, res) => {
             status
         });
 
-        res.send(responseHelpers.successMessage(ticket, res, 200, "Ticket Added Successfully!"));
+        responseHelpers.successMessage(ticket, res, 200, "Ticket Added Successfully!");
     } catch (err) {
         responseHelpers.errorMessage(err, res, 400)
     }
@@ -62,7 +62,7 @@ exports.updateTicketById = async(req, res) => {
                 }, {
                     $set: updateData
                 }).then(result => {
-                    res.send(responseHelpers.successMessage(null, res, 200, "Ticket Status Updated Successfully!"));
+                    responseHelpers.successMessage(null, res, 200, "Ticket Status Updated Successfully!");
                 }).catch(err => {
                     responseHelpers.errorMessage(err, res, 400)
                 });
@@ -81,7 +81,7 @@ exports.getTicketsByStatus = async(req, res) => {
             "status": req.params.status
         }, (err, result) => {
             if (err) responseHelpers.errorMessage(err, res, 400)
-            res.send(responseHelpers.successMessage(result, res, 200, "Ticket List!"));
+            responseHelpers.successMessage(result, res, 200, "Ticket List!");
         });
     } catch (err) {
         responseHelpers.errorMessage(err, res, 400)
@@ -102,7 +102,7 @@ exports.deleteTicketById = async(req, res) => {
                     }, (err) => {
                         responseHelpers.errorMessage(err, res, 400);
                     });
-                    res.send(responseHelpers.successMessage(new mongo.ObjectID(req.params.id), res, 200, "Record Deleted Successfully!"));
+                    responseHelpers.successMessage(new mongo.ObjectID(req.params.id), res, 200, "Record Deleted Successfully!");
                 } catch (err) {
                     responseHelpers.errorMessage(err, res, 400);
                 }
