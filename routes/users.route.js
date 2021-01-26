@@ -3,9 +3,6 @@ const router = express.Router();
 const userControllers = require("../controllers/userControllers");
 const roomController = require("../controllers/roomController");
 const lectureController = require('../controllers/lectureController');
-const tickets = require('../controllers/ticketController');
-
-
 
 // api for singup
 router.post("/signup", userControllers.signup);

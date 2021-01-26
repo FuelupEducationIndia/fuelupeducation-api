@@ -8,13 +8,16 @@ const {
     mongo
 } = require("mongoose");
 
+const path = require('path');
+const responseHelpers = require('../helpers/response.helpers');
+
 // write code for lecture uploadto folder and save in database.
 
 exports.createLecture = async(req, res, next) => {
     var form = new formidable.IncomingForm();
     form.parse(req, (err, fields, files) => {
         if (err) {
-            res.send(err.message);
+            responseHelpers.errorMessage(err, res, 400);
         }
         var newpath = '';
         if (files != '') {
@@ -22,14 +25,14 @@ exports.createLecture = async(req, res, next) => {
                 fs.mkdir(dir, {
                     recursive: true
                 }, (err) => {
-                    res.send(err);
+                    responseHelpers.errorMessage(err, res, 400);
                 });
             }
             var oldpath = files.lecture_video.path;
-            var newpath = __dirname + '/../uploads/lectures/' + files.lecture_video.name;
+            var newpath = path.join(__dirname, '/../uploads/lectures/', files.lecture_video.name);
 
             fs.rename(oldpath, newpath, function(fileErr) {
-                if (fileErr) throw fileErr;
+                if (fileErr) responseHelpers.errorMessage(fileErr, res, 400);
             });
         }
 
@@ -42,12 +45,8 @@ exports.createLecture = async(req, res, next) => {
             user_id: fields.user_id,
         };
         Lecture.insertMany([insertData], function(error, result) {
-            if (error) {
-                res.send(error)
-            } else {
-                res.send(result);
-            }
-
+            if (error) responseHelpers.errorMessage(error, res, 400);
+            responseHelpers.successMessage(result, res, 200, "Lecture Created Successfully!");
         });
     });
 };
@@ -59,14 +58,8 @@ exports.getAllLectures = async(req, res, next) => {
     }, {
         created_at: 0
     }, (err, result) => {
-        if (err) {
-            res.send(err);
-        }
-        if (result) {
-            res.send(result);
-        } else {
-            res.send(JSON.stringify("Data not found!"));
-        }
+        if (err) responseHelpers.errorMessage(err, res, 400);
+        responseHelpers.successMessage(result, res, 200, "Lectures List!");
 
     })
 
@@ -78,14 +71,8 @@ exports.getLecturesById = async(req, res, next) => {
     var lectureList = await Lecture.findById(req.param('id'), {
         created_at: 0
     }, (err, result) => {
-        if (err) {
-            res.send(err);
-        }
-        if (result) {
-            res.send(result);
-        } else {
-            res.send(JSON.stringify("Data not found!"));
-        }
+        if (err) responseHelpers.errorMessage(err, res, 400);
+        responseHelpers.successMessage(result, res, 200, "Lectures Record!");
 
     })
 
@@ -94,23 +81,16 @@ exports.getLecturesById = async(req, res, next) => {
 // Api to delete lecture using lecture id
 exports.deleteLectureById = async(req, res, next) => {
     var getLetcureById = await Lecture.findById(req.param('id'), (err, result) => {
-        if (err) {
-            res.send(err);
-        }
-        if (result) {
-            try {
-                Lecture.deleteOne({
-                    _id: new mongo.ObjectID(req.param('id'))
-                }, (error) => {
-                    if (error) throw error;
-                });
-                res.send(JSON.stringify("Record deleted successfully!"));
-            } catch (e) {
-                res.send(e);
-            }
-
-        } else {
-            res.send(JSON.stringify("Data not found!"));
+        if (err) responseHelpers.errorMessage(err, res, 400);
+        try {
+            Lecture.deleteOne({
+                _id: new mongo.ObjectID(req.param('id'))
+            }, (err) => {
+                responseHelpers.errorMessage(err, res, 400);
+            });
+            responseHelpers.successMessage(new mongo.ObjectID(req.param('id')), res, 200, "Record deleted successfully");
+        } catch (err) {
+            responseHelpers.errorMessage(err, res, 400);
         }
     })
 }
