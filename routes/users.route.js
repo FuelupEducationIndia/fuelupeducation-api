@@ -34,10 +34,4 @@ router.get('/getAllLectures', lectureController.getAllLectures);
 router.get('/getLecturesById', lectureController.getLecturesById);
 router.delete('/deleteLectureById', lectureController.deleteLectureById);
 
-// api for tickets
-router.post('/createTicket', tickets.createTicket);
-router.put('/updateTicketById/:id', tickets.updateTicketById);
-router.delete('/deleteTicketById/:id', tickets.deleteTicketById);
-router.get('/getTicketsByStatus/:status', tickets.getTicketsByStatus);
-
 module.exports = router;
