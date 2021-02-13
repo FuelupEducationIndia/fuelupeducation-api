@@ -1,9 +1,13 @@
 const User = require('../models/user.model')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 const checkSignature = ({ hash, ...userData }) => {
 	// create a hash of a secret with the bot token
-	const secretKey = createHash('sha256').update(process.env.BOT_TOKEN).digest()
+	const secretKey = crypto
+		.createHash('sha256')
+		.update(process.env.BOT_TOKEN)
+		.digest()
 
 	// data returned by telegram is user id, first_name, last_name,auth_date,hash etc.
 	const dataCheckString = Object.keys(userData)
@@ -12,7 +16,8 @@ const checkSignature = ({ hash, ...userData }) => {
 		.join('\n')
 
 	// run a cryptographic hash function over the data to be authenticated and the secret
-	const hmac = createHmac('sha256', secretKey)
+	const hmac = crypto
+		.createHmac('sha256', secretKey)
 		.update(dataCheckString)
 		.digest('hex')
 
