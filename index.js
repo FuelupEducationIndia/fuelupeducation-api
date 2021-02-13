@@ -55,7 +55,7 @@ app.use(async (req, res, next) => {
 app.use('/api/users', route)
 
 //telegram login route
-app.use('/api/telegram', telegramRoute)
+app.use('/auth/telegram', telegramRoute)
 
 app.get('/', (req, res) => {
 	res.redirect(`/${uuidV4()}`)
