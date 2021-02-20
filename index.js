@@ -12,6 +12,14 @@ const mongoose = require("mongoose");
 const route = require("./routes/users.route");
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
+//const routeConfig = require('./config/express');
+const groupsRoute = require('./routes/groups');
+const {
+    ValidationError
+} = require('express-validation');
+// const route = require("./routes");
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 const {
     ExpressPeerServer
 } = require("peer");
@@ -56,6 +64,8 @@ app.use(bodyParse.json({
 app.use(bodyParse.urlencoded({
     extended: true
 }));
+//app.use(routeConfig);
+app.use('/peerjs', peerServer);
 
 
 require("dotenv").config();
@@ -111,8 +121,19 @@ app.post("/uploadRecording", function(req, res) {
     });
 });
 
-//use users route for api/users
-app.use("/api/users", route);
+//use route for api
+//app.use("/api/", route);
+app.use("/api/", groupsRoute);
+//
+app.use(function(err, req, res, next) {
+
+    if (err instanceof ValidationError) {
+        return res.status(err.statusCode).json(err)
+    } else {
+        return res.status(500).json(err)
+    }
+
+});
 
 app.get("/", (req, res) => {
     res.redirect(`/${uuidV4()}`);
