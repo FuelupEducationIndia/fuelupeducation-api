@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userControllers = require("../controllers/userControllers");
 const roomController = require("../controllers/roomController");
+const tickets = require("../controllers/ticketController");
 
 // api for singup
 router.post("/signup", userControllers.signup);
@@ -20,4 +21,9 @@ router.get(
 //api to create room id
 router.get("/createRoom", roomController.createRoomId);
 
+// api for tickets
+router.post('/createTicket', tickets.createTicket);
+router.put('/updateTicketById/:id', tickets.updateTicketById);
+router.delete('/deleteTicketById/:id', tickets.deleteTicketById);
+router.get('/getTicketsByStatus/:status', tickets.getTicketsByStatus);
 module.exports = router;
