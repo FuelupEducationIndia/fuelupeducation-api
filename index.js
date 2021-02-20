@@ -6,7 +6,12 @@ const {
 } = require("./models/user.model");
 const port = process.env.PORT || 5000;
 const mongoose = require("mongoose");
-const route = require("./routes/users.route");
+//const routeConfig = require('./config/express');
+const groupsRoute = require('./routes/groups');
+const {
+    ValidationError
+} = require('express-validation');
+// const route = require("./routes");
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const {
@@ -20,6 +25,7 @@ const {
     v4: uuidV4
 } = require('uuid');
 
+//app.use(routeConfig);
 app.use('/peerjs', peerServer);
 
 app.set('view engine', 'ejs');
@@ -62,8 +68,19 @@ app.use(async(req, res, next) => {
     }
 });
 
-//use users route for api/users
-app.use("/api/users", route);
+//use route for api
+//app.use("/api/", route);
+app.use("/api/", groupsRoute);
+//
+app.use(function(err, req, res, next) {
+
+    if (err instanceof ValidationError) {
+        return res.status(err.statusCode).json(err)
+    } else {
+        return res.status(500).json(err)
+    }
+
+});
 
 app.get('/', (req, res) => {
     res.redirect(`/${uuidV4()}`);
