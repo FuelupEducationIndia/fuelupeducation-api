@@ -1,9 +1,9 @@
 const {
     Ticket
 } = require("../models/ticket.models");
-const {
-    validationResult
-} = require('express-validator');
+// const {
+//     validationResult
+// } = require('express-validator');
 
 const responseHelpers = require('../helpers/response.helpers');
 const {
@@ -13,7 +13,7 @@ const {
 // api to create ticket
 exports.createTicket = async(req, res) => {
     try {
-        validationResult(req).throw();
+        // validationResult(req).throw();
         const {
             title,
             description,
@@ -39,7 +39,7 @@ exports.createTicket = async(req, res) => {
 // update api
 exports.updateTicketById = async(req, res) => {
     try {
-        validationResult(req).throw();
+        // validationResult(req).throw();
 
         await Ticket.find({
             "_id": new mongo.ObjectID(req.params.id)

@@ -1,8 +1,12 @@
 var formidable = require("formidable");
 util = require("util");
-
-const app = require('./config/express');
-
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const bodyParse = require('body-parser');
+const app = express();
+const {
+    User
+} = require("./server/models/user.model");
 const port = process.env.PORT || 5000;
 const mongoose = require("mongoose");
 //const route = require("./routes/users.route");
@@ -10,7 +14,9 @@ const server = require("http").Server(app);
 const io = require("socket.io")(server);
 //const routeConfig = require('./config/express');
 //const groupsRoute = require('./routes/groups');
-
+const {
+    ValidationError
+} = require('express-validation');
 // const route = require("./routes");
 const {
     ExpressPeerServer
@@ -19,7 +25,9 @@ const peerServer = ExpressPeerServer(server, {
     debug: true,
     port: 3030,
 });
-
+const {
+    v4: uuidV4
+} = require("uuid");
 // Call response mondule
 //const responseHelpers = require('../helpers/response.helpers');
 // s3 call
@@ -43,8 +51,17 @@ const s3 = new AWS.S3({
 //     if (err) console.log(err);
 //     else console.log("Bucket Created Successfully", data.Location);
 // });
+app.use("/peerjs", peerServer);
 
+app.set("view engine", "ejs");
+app.use(express.static("public"));
 
+app.use(bodyParse.json({
+    extended: true
+}));
+app.use(bodyParse.urlencoded({
+    extended: true
+}));
 //app.use(routeConfig);
 app.use('/peerjs', peerServer);
 
@@ -60,7 +77,31 @@ mongoose
         console.error("Could not connected to MongoDB.");
     });
 
-
+app.use(express.json());
+app.use(async(req, res, next) => {
+    if (req.headers["x-access-token"]) {
+        const accessToken = req.headers["x-access-token"];
+        const {
+            email,
+            exp
+        } = await jwt.verify(
+            accessToken,
+            process.env.JWT_SECRET
+        );
+        // Check if token has expired
+        if (exp < Date.now().valueOf() / 1000) {
+            return res.status(401).json({
+                error: "JWT token has expired, please login to obtain a new one",
+            });
+        }
+        res.locals.loggedInUser = await User.findOne({
+            email,
+        });
+        next();
+    } else {
+        next();
+    }
+});
 // app.post("/uploadRecording", function(req, res) {
 //     var form = new formidable.IncomingForm();
 //     form.parse(req, function(err, fields, files) {
@@ -82,8 +123,29 @@ mongoose
 //app.use("/api/", route);
 //app.use("/api/", groupsRoute);
 //
+app.use(function(err, req, res, next) {
 
+    if (err instanceof ValidationError) {
+        return res.status(err.statusCode).json(err)
+    } else {
+        return res.status(500).json(err)
+    }
 
+});
+
+app.get("/", (req, res) => {
+    res.redirect(`/${uuidV4()}`);
+});
+
+app.get("/leave", (req, res) => {
+    res.sendFile(__dirname + "/index.html");
+});
+
+app.get("/:room", (req, res) => {
+    res.render("room", {
+        roomId: req.params.room,
+    });
+});
 
 io.on("connection", (socket) => {
     socket.on("join-room", (roomId, userId) => {
