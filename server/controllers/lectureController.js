@@ -20,6 +20,7 @@ exports.createLecture = async(req, res, next) => {
             responseHelpers.errorMessage(err, res, 400);
         }
         var newpath = '';
+        res.send(files);
         if (files != '') {
             if (!fs.existsSync(dir)) {
                 fs.mkdir(dir, {

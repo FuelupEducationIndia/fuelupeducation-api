@@ -5,13 +5,9 @@ const app = require('./config/express');
 
 const port = process.env.PORT || 5000;
 const mongoose = require("mongoose");
-//const route = require("./routes/users.route");
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
-//const routeConfig = require('./config/express');
-//const groupsRoute = require('./routes/groups');
 
-// const route = require("./routes");
 const {
     ExpressPeerServer
 } = require("peer");
@@ -44,8 +40,6 @@ const s3 = new AWS.S3({
 //     else console.log("Bucket Created Successfully", data.Location);
 // });
 
-
-//app.use(routeConfig);
 app.use('/peerjs', peerServer);
 
 
@@ -78,10 +72,6 @@ mongoose
 //     });
 // });
 
-//use route for api
-//app.use("/api/", route);
-//app.use("/api/", groupsRoute);
-//
 
 
 

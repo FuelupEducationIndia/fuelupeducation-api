@@ -20,6 +20,7 @@ app.use(bodyParse.urlencoded({
     extended: true
 }));
 
+
 app.use(express.json());
 app.use(async(req, res, next) => {
     if (req.headers["x-access-token"]) {
