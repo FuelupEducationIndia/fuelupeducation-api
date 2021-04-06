@@ -1,8 +1,9 @@
 const config = require("config");
 const jwt = require("jsonwebtoken");
+const{ User} = require('../models/user.model')
 
 
-module.exports = function(req, res, next) {
+module.exports = async (req, res, next) => {
     //get the token from the header if present
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     //if no token found, return response (without going to the next middelware)
@@ -10,11 +11,12 @@ module.exports = function(req, res, next) {
 
     try {
         //if can verify the token, set req.user and pass to next middleware
-        const decoded = jwt.verify(token, config.get("myprivatekey"));
-        req.user = decoded;
+        const temp =  jwt.verify(token, 'smile');
+        const decoded = await User.findOne({_id:temp._id})
+        req.user =  decoded;
         next();
     } catch (ex) {
         //if invalid token
-        res.status(400).send("Invalid token.");
+        res.status(400).send(ex.message);
     }
 };

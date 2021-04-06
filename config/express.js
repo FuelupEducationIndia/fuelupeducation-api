@@ -1,10 +1,13 @@
 const express = require('express');
 const bodyParse = require('body-parser');
 const jwt = require("jsonwebtoken");
+require("dotenv").config('./.env');
 const {
     ValidationError
 } = require('express-validation');
-const routes = require('../server/routes');
+const userRoutes = require('../server/routes/users');
+const assignmentRoute = require('../server/routes/assignment')
+const studentAssignmentRoute = require('../server/routes/studentAssignment')
 const {
     User
 } = require("../server/models/user.model");
@@ -57,7 +60,9 @@ app.use(function(err, req, res, next) {
 
 });
 
+app.use(userRoutes);
+app.use(assignmentRoute)
+app.use(studentAssignmentRoute)
 
-app.use('/api/', routes);
 
 module.exports = app;
