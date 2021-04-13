@@ -27,7 +27,7 @@ exports.getExam = async (req, res) => {
     await Exam.find(),
       (err, result) => {
         if (error) responseHelpers.errorMessage(err, res, 400);
-        responseHelpers.successMessage(result, res, 200, "Exams List!");
+        responseHelpers.successMessage(result, res, 200, "Exam List!");
       };
     return res.json({ msg: "Exam get request" });
   } catch (err) {
