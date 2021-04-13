@@ -1,19 +1,17 @@
 var formidable = require("formidable");
 util = require("util");
 
-const app = require('./config/express');
+const app = require("./config/express");
 
 const port = process.env.PORT || 5000;
 const mongoose = require("mongoose");
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 
-const {
-    ExpressPeerServer
-} = require("peer");
+const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
-    debug: true,
-    port: 3030,
+  debug: true,
+  port: 3030,
 });
 
 // Call response mondule
@@ -25,10 +23,9 @@ const SECRET = process.env.AWS_SECRET;
 // The name of the bucket that you have created
 const BUCKET_NAME = "videocall-record";
 const s3 = new AWS.S3({
-    accessKeyId: ID,
-    secretAccessKey: SECRET,
+  accessKeyId: ID,
+  secretAccessKey: SECRET,
 });
-// const params = {
 //     Bucket: BUCKET_NAME,
 //     CreateBucketConfiguration: {
 //         // Set your region here
@@ -40,21 +37,19 @@ const s3 = new AWS.S3({
 //     else console.log("Bucket Created Successfully", data.Location);
 // });
 
-app.use('/peerjs', peerServer);
-
-
+app.use("/peerjs", peerServer);
 require("dotenv").config();
 // connect to mongo DB
 mongoose
-    .connect("mongodb://localhost/fuelueducation", {
-        useNewUrlParser: true,
-    })
-    .then(() => console.log("Connected to MongoDB."))
-    .catch((err) => {
-        console.error("Could not connected to MongoDB.");
-    });
-
-
+  .connect("mongodb://localhost/fuelueducation", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB."))
+  .catch((err) => {
+    console.error("Could not connected to MongoDB.");
+  });
+// const params = {
 // app.post("/uploadRecording", function(req, res) {
 //     var form = new formidable.IncomingForm();
 //     form.parse(req, function(err, fields, files) {
@@ -72,23 +67,20 @@ mongoose
 //     });
 // });
 
-
-
-
 io.on("connection", (socket) => {
-    socket.on("join-room", (roomId, userId) => {
-        socket.join(roomId);
-        socket.to(roomId).broadcast.emit("user-connected", userId);
-        // messages
-        socket.on("message", (message) => {
-            //send message to the same room
-            io.to(roomId).emit("createMessage", message, userId);
-        });
-
-        socket.on("disconnect", () => {
-            socket.to(roomId).broadcast.emit("user-disconnected", userId);
-        });
+  socket.on("join-room", (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit("user-connected", userId);
+    // messages
+    socket.on("message", (message) => {
+      //send message to the same room
+      io.to(roomId).emit("createMessage", message, userId);
     });
+
+    socket.on("disconnect", () => {
+      socket.to(roomId).broadcast.emit("user-disconnected", userId);
+    });
+  });
 });
 
 server.listen(process.env.PORT || port);
