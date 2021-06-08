@@ -1,29 +1,16 @@
-var formidable = require("formidable");
-const fs = require("fs");
-var dir = __dirname + "/../uploads/qnaStudents/";
+const formidable = require("formidable");
 const { TeacherPrepMaterial } = require("../models/prepMaterialTeacher.model");
-const { mongo } = require("mongoose");
-
-const path = require("path");
 const responseHelpers = require("../helpers/response.helpers");
 
 // API to post Practice Quiz Test from teacher side login  :
 exports.postCreateQuiz = async (req, res, next) => {
-  if (req.user.role == "teacher") {
-    return responseHelpers.errorMessage(
-      { message: "Only teachers are permitted to Create a Quiz : " },
-      res,
-      401
-    );
-  }
-
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var insertCreateQuizData = {
+    const insertCreateQuizData = {
       course_id: fields.course_id,
       create_quiz: fields.create_quiz,
       board_university: fields.board_university,
@@ -55,22 +42,13 @@ exports.postCreateQuiz = async (req, res, next) => {
 
 // API to post Recommended Podcast from teacher side login  :
 exports.postRecommendedPodcast = async (req, res, next) => {
-  if (req.user.role == "teacher") {
-    return responseHelpers.errorMessage(
-      {
-        message: "Only teachers are permitted to Create Recommended Podcast : "
-      },
-      res,
-      401
-    );
-  }
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var insertCreateRecommendedPodcastData = {
+    const insertCreateRecommendedPodcastData = {
       course_id: fields.course_id,
       recommended_podcasts: fields.recommended_podcasts,
       board_university: fields.board_university,
@@ -100,23 +78,13 @@ exports.postRecommendedPodcast = async (req, res, next) => {
 
 // API to post Recommended Readings from teacher side login  :
 exports.postRecommendedReadings = async (req, res, next) => {
-  if (req.user.role == "teacher") {
-    return responseHelpers.errorMessage(
-      {
-        message:
-          "Only teachers are permitted to Create a Recommended Reading : "
-      },
-      res,
-      401
-    );
-  }
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var insertRecommendedReadingData = {
+    const insertRecommendedReadingData = {
       course_id: fields.course_id,
       recommended_readings: fields.recommended_readings,
       board_university: fields.board_university,

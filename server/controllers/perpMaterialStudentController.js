@@ -1,15 +1,10 @@
-var formidable = require("formidable");
-const fs = require("fs");
-var dir = __dirname + "/../uploads/qnaStudents/";
+const formidable = require("formidable");
 const { StudentPrepMaterial } = require("../models/prepMaterialsStudent.model");
-const { mongo } = require("mongoose");
-
-const path = require("path");
 const responseHelpers = require("../helpers/response.helpers");
 
 // API to get the recommended reading details based on CourseId and board/lecture/lang details the request Param :
 exports.getRecommendedReadings = async (req, res, next) => {
-  var prepMaterialList = await StudentPrepMaterial.findById(
+  const prepMaterialList = await StudentPrepMaterial.findById(
     req.param("course_id"),
     {
       board_university: "University1",
@@ -30,7 +25,7 @@ exports.getRecommendedReadings = async (req, res, next) => {
 
 // API to get the recommended podcast details based on CourseId and board/lecture/lang details the request Param :
 exports.getRecommendedPodcasts = async (req, res, next) => {
-  var prepMaterialList = await StudentPrepMaterial.findById(
+  const prepMaterialList = await StudentPrepMaterial.findById(
     req.param("course_id"),
     {
       board_university: "University1",
@@ -51,7 +46,7 @@ exports.getRecommendedPodcasts = async (req, res, next) => {
 
 // API to get the practice test data details :
 exports.getPracticeTestData = async (req, res, next) => {
-  var practiceTestData = await StudentPrepMaterial.findById(
+  const practiceTestData = await StudentPrepMaterial.findById(
     req.param("course_id"),
     {
       practice_question: [
@@ -86,13 +81,13 @@ exports.postPracticeTest = async (req, res, next) => {
     );
   }
 
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var insertPracticeTestData = {
+    const insertPracticeTestData = {
       user_id: fields.user_id,
       course_id: fields.course_id,
       practice_questions: fields.practice_questions,

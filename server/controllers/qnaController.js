@@ -1,21 +1,20 @@
-var formidable = require("formidable");
+const formidable = require("formidable");
 const fs = require("fs");
-var dir = __dirname + "/../uploads/qnaStudents/";
+const dir = __dirname + "/../uploads/qnaStudents/";
 const { Qna } = require("../models/qna.model");
 const { mongo } = require("mongoose");
-
 const path = require("path");
 const responseHelpers = require("../helpers/response.helpers");
 
 // api to post a question from Student Account Login  :
 exports.postQuestion = async (req, res, next) => {
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var newPath = "";
+    const newPath = "";
     res.sendFiles(files);
 
     if (files != "") {
@@ -30,8 +29,8 @@ exports.postQuestion = async (req, res, next) => {
           }
         );
       }
-      var oldpath = files.attachment.path;
-      var newpath = path.join(
+      const oldpath = files.attachment.path;
+      const newpath = path.join(
         __dirname,
         "/../uploads/qnaAttachment/question/",
         files.attachment.name
@@ -42,7 +41,7 @@ exports.postQuestion = async (req, res, next) => {
       });
     }
 
-    var insertQuestionData = {
+    const insertQuestionData = {
       course_id: fields.course_id,
       posted_at_timestamp: fields.posted_at_timestamp,
       question_posted: fields.question_posted,
@@ -67,13 +66,13 @@ exports.postQuestion = async (req, res, next) => {
 
 // api to post a question from Student Account Login  :
 exports.postAnswer = async (req, res, next) => {
-  var form = new formidable.IncomingForm();
+  const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
       responseHelpers.errorMessage(err, res, 400);
     }
 
-    var newPath = "";
+    const newPath = "";
     res.sendFiles(files);
 
     if (files != "") {
@@ -88,8 +87,8 @@ exports.postAnswer = async (req, res, next) => {
           }
         );
       }
-      var oldpath = files.attachment.path;
-      var newpath = path.join(
+      const oldpath = files.attachment.path;
+      const newpath = path.join(
         __dirname,
         "/../uploads/qnaAttachment/",
         files.attachment.name
@@ -100,7 +99,7 @@ exports.postAnswer = async (req, res, next) => {
       });
     }
 
-    var insertAnswerData = {
+    const insertAnswerData = {
       course_id: fields.course_id,
       posted_at_timestamp: fields.posted_at_timestamp,
       answer_posted: fields.answer_posted,
@@ -124,7 +123,7 @@ exports.postAnswer = async (req, res, next) => {
 
 // API to get Question details based on Id in the request Param :
 exports.getQuestionById = async (req, res, next) => {
-  var qnaList = await Qna.findById(
+  const qnaList = await Qna.findById(
     req.param("id"),
     {
       posted_at_timestamp: 0
@@ -143,7 +142,7 @@ exports.getQuestionById = async (req, res, next) => {
 
 //API to get answer details based on Id in the request param :
 exports.getAnswerById = async (req, res, next) => {
-  var qnaList = await Qna.findById(
+  const qnaList = await Qna.findById(
     req.param("id"),
     {
       posted_at_timestamp: 0
@@ -163,49 +162,37 @@ exports.getAnswerById = async (req, res, next) => {
 //API to delete a question by Id in the request param :
 exports.deleteQuestionById = async (req, res, next) => {
   //Student role is not authorized to delete any question:
-  if (!req.user.role == "student") {
-    return responseHelpers.errorMessage(
-      { message: "student role is not authorized to perform delete : " },
-      res,
-      401
-    );
-  }
 
-  var deleteQuestionId = await Qna.findById(req.param("id"), (err, result) => {
-    if (err) responseHelpers.errorMessage(err, res, 400);
-    try {
-      Qna.deleteOne(
-        {
-          _id: new mongo.ObjectID(req.param("id"))
-        },
-        err => {
-          responseHelpers.errorMessage(err, res, 400);
-        }
-      );
-      responseHelpers.successMessage(
-        new mongo.ObjectID(req.param("id")),
-        res,
-        200,
-        "Question deleted successfully"
-      );
-    } catch (err) {
-      responseHelpers.errorMessage(err, res, 400);
+  const deleteQuestionId = await Qna.findById(
+    req.param("id"),
+    (err, result) => {
+      if (err) responseHelpers.errorMessage(err, res, 400);
+      try {
+        Qna.deleteOne(
+          {
+            _id: new mongo.ObjectID(req.param("id"))
+          },
+          err => {
+            responseHelpers.errorMessage(err, res, 400);
+          }
+        );
+        responseHelpers.successMessage(
+          new mongo.ObjectID(req.param("id")),
+          res,
+          200,
+          "Question deleted successfully"
+        );
+      } catch (err) {
+        responseHelpers.errorMessage(err, res, 400);
+      }
     }
-  });
+  );
 };
 
 // API to delete an answer by Id in the request param :
 exports.deleteAnswerById = async (req, res, next) => {
   //Student role is not authorized to delete any answer:
-  if (!req.user.role == "student") {
-    return responseHelpers.errorMessage(
-      { message: "student role is not authorized to perform delete : " },
-      res,
-      401
-    );
-  }
-
-  var deleteAnswerId = await Qna.findById(req.param("id"), (err, result) => {
+  const deleteAnswerId = await Qna.findById(req.param("id"), (err, result) => {
     if (err) responseHelpers.errorMessage(err, res, 400);
     try {
       Qna.deleteOne(
