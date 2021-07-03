@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParse = require('body-parser');
 const jwt = require("jsonwebtoken");
-require("dotenv").config('./.env');
+// require("dotenv").config('./.env');
 const {
     ValidationError
 } = require('express-validation');
@@ -64,5 +64,20 @@ app.use(userRoutes);
 app.use(assignmentRoute)
 app.use(studentAssignmentRoute)
 
+
+
+
+
+const boardUniversityRoutes = require('../server/routes/boardUniversityRoutes')
+const courseRoutes = require('../server/routes/courseRoutes')
+const languageRoutes = require('../server/routes/languageRoutes')
+const sectionRoutes = require('../server/routes/sectionRoutes')
+const questionRoutes = require('../server/routes/questionRoutes')
+
+app.use('/api', boardUniversityRoutes)
+app.use('/api', courseRoutes)
+app.use('/api', languageRoutes)
+app.use('/api', sectionRoutes)
+app.use('/api', questionRoutes)
 
 module.exports = app;
