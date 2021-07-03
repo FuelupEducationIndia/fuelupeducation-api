@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose;
-
-
 const languageSchema = new Schema({
     name:{
         type: String,
@@ -9,8 +7,6 @@ const languageSchema = new Schema({
         trim: true,
     },
 }, {timestamps:true});
-
-
 module.exports =  mongoose.model('Language', languageSchema)
 
 

@@ -1,9 +1,5 @@
 const sectionModel = require('../models/sectionModel')
-
-
 module.exports = {
-
-
     addSection: function(req, res) {
         const { name, courseId, languageId, examTime } = req.body
         const _name = name.toLowerCase()
@@ -13,13 +9,10 @@ module.exports = {
         sectionModel.findOne({$and: [{ name }, {courseId}, {languageId}]}).exec(function (err, section) {
             if (err)
                 return res.json({ "err": err });
-    
             if (section)
                 return res.json({ message: "Section Already Exists..." });
-    
             else {
                 const _section = new sectionModel(newData);
-    
                 _section.save((error, data) => {
                     if (error) {
                         return res.json({
@@ -35,10 +28,6 @@ module.exports = {
             }
         });
     },
-    
-    
-    
-    
     getSections: function(req, res){
         const { courseId, languageId } = req.body
         sectionModel.find({$and: [{courseId}, {languageId}]}).exec(function(err, data){
@@ -47,7 +36,4 @@ module.exports = {
             if(data) return res.json({"sections": data})
         })
     }
-    
-
-
 }

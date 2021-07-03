@@ -1,9 +1,5 @@
-// import { check, validationResult } from 'express-validator';
 const expressValidator = require('express-validator');
 const {check, validationResult} = expressValidator
-
-
-
 module.exports = {
     isRequestValidated: function(req, res, next){
         const errors = validationResult(req)

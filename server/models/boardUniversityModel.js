@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose;
-
 const boardUniversitySchema = new Schema({
     name:{
         type: String,
@@ -8,8 +7,6 @@ const boardUniversitySchema = new Schema({
         trim: true,
     },
 }, {timestamps:true});
-
-
 module.exports = mongoose.model('Board_University', boardUniversitySchema)
 
 

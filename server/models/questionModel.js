@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
-
-
 const questionSchema = new Schema({
     name: {
         type: String,
@@ -17,22 +15,16 @@ const questionSchema = new Schema({
             },
         }
     ],
-
     correctOption: {
         type: String,
         required: true,
         trim: true,
     },
-
     sectionId: {
         type: mongoose.Types.ObjectId,
         required: true,
     },
-
-
 }, { timestamps: true });
-
-
 module.exports = mongoose.model('Question', questionSchema)
 
 

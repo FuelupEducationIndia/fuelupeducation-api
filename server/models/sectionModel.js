@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose;
-
-
 const sectionSchema = new Schema({
     name: {
         type: String,
@@ -20,10 +18,7 @@ const sectionSchema = new Schema({
         type: Number,
         required: true
     }
-
 }, {timestamps:true});
-
-
 module.exports = mongoose.model('Section', sectionSchema)
 
 
